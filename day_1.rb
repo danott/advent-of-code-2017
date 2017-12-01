@@ -18,6 +18,11 @@ class TheTest < Minitest::Test
     assert_equal 12, diamater_captcha("123123")
     assert_equal 4, diamater_captcha("12131415")
   end
+
+  def test_refactoring
+    assert_equal 1089, sibling_captcha(INPUT)
+    assert_equal 1156, diamater_captcha(INPUT)
+  end
 end
 
 def sibling_captcha(string)
