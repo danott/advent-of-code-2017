@@ -21,18 +21,16 @@ class TheTest < Minitest::Test
 end
 
 def sibling_captcha(string)
-  previous = string[-1]
-  string.chars.reduce(0) do |memo, char|
-    memo += char.to_i if previous == char
-    previous = char
+  string.chars.each_with_index.reduce(0) do |memo, (char, index)|
+    memo += char.to_i if string[index - 1] == char
     memo
   end
 end
 
 def diamater_captcha(string)
+  half_of_length = string.length / 2
   string.chars.each_with_index.reduce(0) do |memo, (char, index)|
-    diamter_index = (index + (string.length / 2)) % string.length
-    memo += char.to_i if char == string[diamter_index]
+    memo += char.to_i if char == string[index - half_of_length]
     memo
   end
 end
