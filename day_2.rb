@@ -1,17 +1,7 @@
 require "minitest"
 require "minitest/autorun"
 
-class Array
-  def head
-    self[0]
-  end
-
-  def tail
-    self[1..-1]
-  end
-end
-
-TEST_SHEET = <<~ROWS
+TEST_MINMAX_SHEET = <<~ROWS
 5 1 9 5
 7 5 3
 2 4 6 8
@@ -24,14 +14,14 @@ TEST_DIVISION_SHEET = <<~ROWS
 ROWS
 
 class TheTest < Minitest::Test
-  def test_row_checksum
-    assert_equal 8, row_checksum("5 1 9 5")
-    assert_equal 4, row_checksum("7 5 3")
-    assert_equal 6, row_checksum("2 4 6 8")
+  def test_row_minmax_checksum
+    assert_equal 8, row_minmax_checksum("5 1 9 5")
+    assert_equal 4, row_minmax_checksum("7 5 3")
+    assert_equal 6, row_minmax_checksum("2 4 6 8")
   end
 
-  def test_sheet_checksum
-    assert_equal 18, sheet_checksum(TEST_SHEET)
+  def test_sheet_minmax_checksum
+    assert_equal 18, sheet_minmax_checksum(TEST_MINMAX_SHEET)
   end
 
   def test_row_division_checksum
@@ -45,18 +35,18 @@ class TheTest < Minitest::Test
   end
 
   def test_refactoring_correct_answers
-    assert_equal 39126, sheet_checksum(SHEET)
+    assert_equal 39126, sheet_minmax_checksum(SHEET)
     assert_equal 258, sheet_division_checksum(SHEET)
   end
 end
 
-def row_checksum(row)
+def row_minmax_checksum(row)
   integers = row.split.map(&:to_i)
   integers.max - integers.min
 end
 
-def sheet_checksum(sheet)
-  sheet.lines.reduce(0) { |memo, row| memo + row_checksum(row) }
+def sheet_minmax_checksum(sheet)
+  sheet.lines.reduce(0) { |memo, row| memo + row_minmax_checksum(row) }
 end
 
 def row_division_checksum(row)
@@ -104,10 +94,10 @@ SHEET = <<~ROWS
 1311	64	77	1328	1344	1248	1522	51	978	1535	1142	390	81	409	68	352
 ROWS
 
-result = sheet_checksum(SHEET)
+result = sheet_minmax_checksum(SHEET)
 division_result = sheet_division_checksum(SHEET)
 
 puts "🎄 " * 40
-puts "Sheet checksum: #{result}"
+puts "Sheet minmax checksum: #{result}"
 puts "Sheet division checksum: #{division_result}"
 puts "🎄 " * 40
