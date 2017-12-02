@@ -43,6 +43,11 @@ class TheTest < Minitest::Test
   def test_sheet_division_checksum
     assert_equal 9, sheet_division_checksum(TEST_DIVISION_SHEET)
   end
+
+  def test_refactoring_correct_answers
+    assert_equal 39126, sheet_checksum(SHEET)
+    assert_equal 258, sheet_division_checksum(SHEET)
+  end
 end
 
 def row_checksum(row)
