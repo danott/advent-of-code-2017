@@ -1,10 +1,26 @@
 require "minitest"
 require "minitest/autorun"
 
+class Array
+  def head
+    self[0]
+  end
+
+  def tail
+    self[1..-1]
+  end
+end
+
 TEST_SHEET = <<~ROWS
 5 1 9 5
 7 5 3
 2 4 6 8
+ROWS
+
+TEST_DIVISION_SHEET = <<~ROWS
+5 9 2 8
+9 4 7 3
+3 8 6 5
 ROWS
 
 class TheTest < Minitest::Test
@@ -17,6 +33,16 @@ class TheTest < Minitest::Test
   def test_sheet_checksum
     assert_equal 18, sheet_checksum(TEST_SHEET)
   end
+
+  def test_row_division_checksum
+    assert_equal 4, row_division_checksum("5 9 2 8")
+    assert_equal 3, row_division_checksum("9 4 7 3")
+    assert_equal 2, row_division_checksum("3 8 6 5")
+  end
+
+  def test_sheet_division_checksum
+    assert_equal 9, sheet_division_checksum(TEST_DIVISION_SHEET)
+  end
 end
 
 def row_checksum(row)
@@ -26,6 +52,32 @@ end
 
 def sheet_checksum(sheet)
   sheet.lines.reduce(0) { |memo, row| memo + row_checksum(row) }
+end
+
+def row_division_checksum(row)
+  floats = row.split.map(&:to_f).sort.reverse
+  find_factor(floats)
+end
+
+def find_factor(list)
+  return 0 if list.length == 0
+  head = list[0]
+  tail = list[1..-1]
+
+  divisor = tail.find do |candidate|
+    result = head / candidate
+    result.floor == result
+  end
+
+  if divisor
+    (head / divisor).to_i
+  else
+    find_factor tail
+  end
+end
+
+def sheet_division_checksum(sheet)
+  sheet.lines.reduce(0) { |memo, row| memo + row_division_checksum(row) }
 end
 
 SHEET = <<~ROWS
@@ -48,7 +100,9 @@ SHEET = <<~ROWS
 ROWS
 
 result = sheet_checksum(SHEET)
+division_result = sheet_division_checksum(SHEET)
 
 puts "🎄 " * 40
 puts "Sheet checksum: #{result}"
+puts "Sheet division checksum: #{division_result}"
 puts "🎄 " * 40
