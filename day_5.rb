@@ -47,27 +47,22 @@ end
 class JumpInstructionMaze
   def self.steps_required(string, incrementor:)
     maze = parse(string, incrementor: incrementor)
-    iterations = 0
-
-    until maze.escaped?
-      maze = maze.next
-      iterations += 1
-    end
-
-    iterations
+    maze.next until maze.escaped?
+    maze.iterations
   end
 
   def self.parse(string, incrementor:)
     instructions = string.split.map(&:to_i)
-    self.new(instructions: instructions, cursor: 0, incrementor: incrementor)
+    self.new(instructions: instructions, incrementor: incrementor)
   end
 
-  attr_reader :instructions, :cursor, :incrementor
+  attr_reader :instructions, :cursor, :incrementor, :iterations
 
-  def initialize(instructions:, cursor:, incrementor:)
+  def initialize(instructions:, incrementor:)
     @instructions = instructions
-    @cursor = cursor
     @incrementor = incrementor
+    @cursor = 0
+    @iterations = 0
   end
 
   def next
@@ -75,6 +70,7 @@ class JumpInstructionMaze
     instruction_was = instructions[cursor]
     instructions[cursor] = incrementor.call(instruction_was)
     @cursor += instruction_was
+    @iterations += 1
     self
   end
 
