@@ -72,11 +72,10 @@ class JumpInstructionMaze
 
   def next
     return self if escaped?
-    next_instructions = instructions.each_with_index.map do |instruction, index|
-      cursor == index ? incrementor.call(instruction) : instruction
-    end
-    next_cursor = cursor + instructions[cursor]
-    self.class.new(instructions: next_instructions, cursor: next_cursor, incrementor: incrementor)
+    instruction_was = instructions[cursor]
+    instructions[cursor] = incrementor.call(instruction_was)
+    @cursor += instruction_was
+    self
   end
 
   def to_a
@@ -95,6 +94,6 @@ INCREMENTOR_PART_2 = proc do |instruction|
 end
 
 puts "🎄 " * 40
-# puts "Iterations required in step 1: #{JumpInstructionMaze.steps_required(INPUT, incrementor: INCREMENTOR_PART_1)}"
+puts "Iterations required in step 1: #{JumpInstructionMaze.steps_required(INPUT, incrementor: INCREMENTOR_PART_1)}"
 puts "Iterations required in step 2: #{JumpInstructionMaze.steps_required(INPUT, incrementor: INCREMENTOR_PART_2)}"
 puts "🎄 " * 40
