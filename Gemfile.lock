@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    awesome_print (1.8.0)
     coderay (1.1.2)
     ffi (1.9.18)
     formatador (0.2.5)
@@ -42,6 +43,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   guard
   guard-shell
   minitest
