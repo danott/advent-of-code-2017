@@ -17,7 +17,6 @@
 
 # Add files and commands to this file, like the example:
 #   watch(%r{file/path}) { `command(s)` }
-#
-guard :shell do
-  watch(/(.*\.rb)$/) {|m| `ruby #{m[0]}` }
+guard :minitest, all_on_start: false, all_after_pass: false do
+  watch(%r{^test/(.*)_test\.rb$})
 end
