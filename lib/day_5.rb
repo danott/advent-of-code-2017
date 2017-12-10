@@ -83,7 +83,7 @@ class JumpInstructionMaze
   end
 end
 
-INPUT = File.read("./day_5_input.txt")
+INPUT = File.read("lib/day_5_input.txt")
 INCREMENTOR_PART_1 = proc { |instruction| instruction + 1 }
 INCREMENTOR_PART_2 = proc do |instruction|
   instruction >= 3 ? instruction - 1 : instruction + 1

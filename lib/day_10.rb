@@ -90,6 +90,6 @@ class KnotHash
   end
 
   def to_s
-    dense_hash.reduce("") { |m, d| m + d.to_s(16).rjust(2, "0") }
+    dense_hash.reduce("") { |a, e| a + e.to_s(16).rjust(2, "0") }
   end
 end

@@ -69,7 +69,7 @@ class TheTest < Minitest::Test
   end
 
   def test_refactoring
-    fixture = File.read("./day_4_input.txt")
+    fixture = File.read("lib/day_4_input.txt")
 
     assert_equal 386, count_valid_uniq_words_passphrases(fixture)
     assert_equal 208, count_valid_uniq_anagrams_passphrases(fixture)
@@ -99,7 +99,7 @@ def count_valid_uniq_anagrams_passphrases(string)
   count_valid_passphrases(string) { |l| all_anagrams_uniq?(l) }
 end
 
-fixture = File.read("./day_4_input.txt")
+fixture = File.read("lib/day_4_input.txt")
 result_part_1 = count_valid_uniq_words_passphrases(fixture)
 result_part_2 = count_valid_uniq_anagrams_passphrases(fixture)
 

@@ -148,7 +148,7 @@ class Program
   end
 end
 
-PUZZLE_INPUT = File.read("./day_8_input.txt")
+PUZZLE_INPUT = File.read("lib/day_8_input.txt")
 
 puts "🎄 " * 40
 puts "The maximum value in a register after executing the program: #{Program.parse(PUZZLE_INPUT).max_after_execution}"

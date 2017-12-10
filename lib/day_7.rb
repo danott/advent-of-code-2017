@@ -3,7 +3,7 @@ require "minitest"
 require "minitest/autorun"
 require "pry"
 
-PUZZLE_INPUT = File.read("./day_7_input.txt")
+PUZZLE_INPUT = File.read("lib/day_7_input.txt")
 
 class TheTest < Minitest::Test
   TEST_INPUT = <<~END

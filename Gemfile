@@ -2,10 +2,11 @@
 
 source "https://rubygems.org"
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
-gem "pry"
+gem "awesome_print"
 gem "guard"
 gem "guard-minitest"
 gem "minitest"
-gem "awesome_print"
+gem "pry"
+gem "rubocop"

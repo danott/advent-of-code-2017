@@ -114,7 +114,7 @@ class Group
   end
 end
 
-PUZZLE_INPUT = File.read("./day_9_input.txt")
+PUZZLE_INPUT = File.read("lib/day_9_input.txt")
 puts "🎄 " * 40
 puts "Total score is #{Group.parse(PUZZLE_INPUT).score}"
 puts "Total garbage removed is #{Group.parse(PUZZLE_INPUT).all_the_garbage.count}"
