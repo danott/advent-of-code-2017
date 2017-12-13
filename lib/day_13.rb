@@ -21,73 +21,65 @@ class TheTest < Minitest::Test
   end
 
   def test_refactoring
-    skip
+    skip "Calculating the delay is extremely slow"
     assert_equal 1300, severity_of_trip(PUZZLE_INPUT)
     assert_equal 3870382, delay_for_safe_travel(PUZZLE_INPUT)
   end
 end
 
 def severity_of_trip(puzzle_input)
-  firewall_columns = puzzle_input.lines.map do |line|
-    depth, range = line.split(": ").map(&:to_i)
-    FirewallColumn.new(depth: depth, range: range).call
-  end
-  firewall_columns = firewall_columns.select { |f| f.position.zero? }
-  firewall_columns.map(&:severity).reduce(&:+)
+  Firewall.parse(puzzle_input).severity
 end
 
 def delay_for_safe_travel(puzzle_input)
   firewall = Firewall.parse(puzzle_input)
   firewall.next until firewall.safe?
-  firewall.columns.first.time
+  firewall.delay
 end
 
 class Firewall
   def self.parse(puzzle_input)
     columns = puzzle_input.lines.map do |line|
       depth, range = line.split(": ").map(&:to_i)
-      FirewallColumn.new(depth: depth, range: range).call
+      FirewallColumn.new(depth: depth, range: range)
     end
     new(columns: columns)
   end
 
-  attr_reader :columns
-  def initialize(columns:)
+  attr_reader :columns, :delay
+
+  def initialize(columns:, delay: 0)
+    @delay = delay
     @columns = columns
   end
 
   def next
+    @delay = delay.next
     columns.each(&:next)
   end
 
   def safe?
     columns.all?(&:safe?)
   end
+
+  def severity
+    columns.reject(&:safe?).map(&:severity).reduce(&:+)
+  end
 end
 
 class FirewallColumn
-  attr_reader :depth, :range, :position, :time
+  attr_reader :depth, :range, :position
 
   def initialize(depth:, range:)
     @depth = depth
     @range = range
     @position = cycle.next
-    @time = 0
+    depth.times { self.next }
   end
 
   def next
     @position = cycle.next
-    @time = time.next
     self
-  end
-
-  def call
-    self.next until done?
-    self
-  end
-
-  def done?
-    time == depth
   end
 
   def safe?
