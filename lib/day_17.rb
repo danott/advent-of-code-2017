@@ -26,7 +26,7 @@ class TheTest < Minitest::Test
     # Taking advantage of 0 index is always zero in the circle.
     s = StupidLock.new(step: 303)
     s.next until s.size > 50_000_000
-    assert_equal 17202899, s.last_insert_at_index_1
+    assert_equal 17202899, s.last_index_one_insert
   end
 end
 
@@ -47,7 +47,7 @@ class Spinlock
 end
 
 class StupidLock
-  attr_reader :step, :position, :size, :last_insert_at_index_1
+  attr_reader :step, :position, :size, :last_index_one_insert
 
   def initialize(step:, position: 0, size: 1)
     @step = step
@@ -57,7 +57,7 @@ class StupidLock
 
   def next
     @position = ((position + step) % size) + 1
-    @last_insert_at_index_1 = size if position == 1
+    @last_index_one_insert = size if position == 1
     @size += 1
     self
   end
