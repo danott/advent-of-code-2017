@@ -87,26 +87,27 @@ class TheTest < Minitest::Test
       rcv c
       rcv d
     TEST
-    a_queue = []
-    b_queue = []
+    program_0_to_program_1 = []
+    program_1_to_program_0 = []
 
-    a = Program.parse(PUZZLE_INPUT)
-    b = Program.parse(PUZZLE_INPUT)
+    program_0 = Program.parse(PUZZLE_INPUT)
+    program_1 = Program.parse(PUZZLE_INPUT)
 
-    a.state["p"] = 0
-    a.send_to = b_queue
-    a.receive_from = a_queue
+    program_0.state["p"] = 0
+    program_1.state["p"] = 1
 
-    b.state["p"] = 1
-    b.send_to = a_queue
-    b.receive_from = b_queue
+    program_0.send_to = program_0_to_program_1
+    program_0.receive_from = program_1_to_program_0
 
-    until a.done? || b.done? || (a.lock? && b.lock?)
-      a.next
-      b.next
+    program_1.send_to = program_1_to_program_0
+    program_1.receive_from = program_0_to_program_1
+
+    until program_0.done? || program_1.done? || (program_0.lock? && program_1.lock?)
+      program_0.next
+      program_1.next
     end
 
-    assert_equal 3, b.sends
+    assert_equal 7493, program_1.sends
   end
 end
 
@@ -128,7 +129,7 @@ class Program
   end
 
   def next
-    return self if next_instruction.nil?
+    return self if done? || lock?
     @index += 1 if send(
       next_instruction.command,
       arg_x: next_instruction.arg_x,
@@ -142,7 +143,7 @@ class Program
   end
 
   def lock?
-    return true if done?
+    return false if next_instruction.nil?
     next_instruction.command == "rcv" && receive_from.size.zero?
   end
 
