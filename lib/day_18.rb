@@ -3,111 +3,65 @@ require "minitest/autorun"
 require "pry"
 require "awesome_print"
 
-TEST_INPUT = <<~TEST
-set a 1
-add a 2
-mul a a
-mod a 5
-snd a
-set a 0
-rcv a
-jgz a -1
-set a 1
-jgz a -2
-TEST
-
-PUZZLE_INPUT = <<~END
-set i 31
-set a 1
-mul p 17
-jgz p p
-mul a 2
-add i -1
-jgz i -2
-add a -1
-set i 127
-set p 618
-mul p 8505
-mod p a
-mul p 129749
-add p 12345
-mod p a
-set b p
-mod b 10000
-snd b
-add i -1
-jgz i -9
-jgz a 3
-rcv b
-jgz b -1
-set f 0
-set i 126
-rcv a
-rcv b
-set p a
-mul p -1
-add p b
-jgz p 4
-snd a
-set a b
-jgz 1 3
-snd b
-set f 1
-add i -1
-jgz i -11
-snd a
-jgz f -16
-jgz a -19
-END
+PUZZLE_INPUT = File.read("lib/day_18_input.txt")
 
 class TheTest < Minitest::Test
   def test_part_1
-    p = Program.parse(PUZZLE_INPUT)
+    program = Program.parse(PUZZLE_INPUT)
+
     sound_bank = []
-    p.send_to = sound_bank
-    p.receive_from = sound_bank
+    last_sound_bank = sound_bank.clone
 
-    last_sound_bank = sound_bank.dup
+    program.channel_out = sound_bank
+    program.channel_in = sound_bank
 
-    while last_sound_bank.length <= sound_bank.length
-      last_sound_bank = sound_bank.dup
-      p.next
+    while last_sound_bank.size <= sound_bank.size
+      last_sound_bank = sound_bank.clone
+      program.next
     end
 
     assert_equal 3423, last_sound_bank.last
   end
 
   def test_part_2
-    test_input = <<~TEST
-      snd 1
-      snd 2
-      snd p
-      rcv a
-      rcv b
-      rcv c
-      rcv d
-    TEST
-    program_0_to_program_1 = []
-    program_1_to_program_0 = []
+    coordinator = Coordinator.new(
+      program0: Program.parse(PUZZLE_INPUT),
+      program1: Program.parse(PUZZLE_INPUT),
+    )
 
-    program_0 = Program.parse(PUZZLE_INPUT)
-    program_1 = Program.parse(PUZZLE_INPUT)
+    coordinator.next until coordinator.done?
 
-    program_0.state["p"] = 0
-    program_1.state["p"] = 1
+    assert_equal 7493, coordinator.program1.sends
+  end
+end
 
-    program_0.send_to = program_0_to_program_1
-    program_0.receive_from = program_1_to_program_0
+class Coordinator
+  attr_reader :program0, :program1
 
-    program_1.send_to = program_1_to_program_0
-    program_1.receive_from = program_0_to_program_1
+  def initialize(program0:, program1:)
+    program0.channel_out = []
+    program1.channel_out = []
+    program0.channel_in = program1.channel_out
+    program1.channel_in = program0.channel_out
+    program0.state["p"] = 0
+    program1.state["p"] = 1
+    @program0 = program0
+    @program1 = program1
+  end
 
-    until program_0.done? || program_1.done? || (program_0.lock? && program_1.lock?)
-      program_0.next
-      program_1.next
-    end
+  def done?
+    program0.done? || program1.done? || deadlock?
+  end
 
-    assert_equal 7493, program_1.sends
+  def next
+    program0.next
+    program1.next
+  end
+
+  private
+
+  def deadlock?
+    program0.lock? && program1.lock?
   end
 end
 
@@ -119,7 +73,7 @@ class Program
     new(instructions: instructions)
   end
 
-  attr_accessor :state, :send_to, :receive_from, :instructions, :index, :sends
+  attr_accessor :state, :channel_out, :channel_in, :instructions, :index, :sends
 
   def initialize(instructions:)
     @state = Hash.new(0)
@@ -144,7 +98,7 @@ class Program
 
   def lock?
     return false if next_instruction.nil?
-    next_instruction.command == "rcv" && receive_from.size.zero?
+    next_instruction.command == "rcv" && channel_in.size.zero?
   end
 
   private
@@ -171,13 +125,13 @@ class Program
 
   def snd(arg_x:, **_)
     @sends += 1
-    send_to.push(coerce_arg(arg_x))
+    channel_out.push(coerce_arg(arg_x))
     true
   end
 
   def rcv(arg_x:, **_)
-    return false if receive_from.size.zero?
-    state[arg_x] = receive_from.shift
+    return false if channel_in.size.zero?
+    state[arg_x] = channel_in.shift
     true
   end
 
