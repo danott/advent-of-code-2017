@@ -15,14 +15,18 @@ class TheTest < Minitest::Test
     assert_equal 12, root.count
   end
 
-  def test_part_2
-  end
-
   def test_execute_part_1
     root = PixelSquare.from_s(BEGINNING_SQUARE)
     transformer = Transformer.parse(PUZZLE_INPUT)
     5.times { root = iterate(root, transformer) }
-    assert_equal 12, root.count
+    assert_equal 155, root.count
+  end
+
+  def test_execute_part_2
+    root = PixelSquare.from_s(BEGINNING_SQUARE)
+    transformer = Transformer.parse(PUZZLE_INPUT)
+    18.times { root = iterate(root, transformer) }
+    assert_equal 2449665, root.count
   end
 end
 
@@ -77,16 +81,20 @@ class Transformer
 
   def initialize(transformations)
     @transformations = transformations
+    @permutations_cache = {}
+    @key_for_permutation_cache = {}
   end
 
   def call(pixel_square)
-    key = transformations.keys.find { |k| permutations(pixel_square).include?(k) }
-    binding.pry if key.nil?
-    transformations.fetch(key)
+    transformations.fetch(key_for_permutation(pixel_square))
+  end
+
+  def key_for_permutation(pixel_square)
+    @key_for_permutation_cache[pixel_square.to_s] ||= transformations.keys.find { |k| permutations(pixel_square).include?(k) }
   end
 
   def permutations(pixel_square)
-    [
+    @permutations_cache[pixel_square.to_s] ||= [
       pixel_square.to_s,
       pixel_square.flip_horizontally.to_s,
       pixel_square.flip_vertically.to_s,
